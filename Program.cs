@@ -1,72 +1,49 @@
-using Gtk;
-using System;
-
-class Hello
-{
-    static void Main ()
-    {
-        Application.Init ();
-
-        Window window = new Window ("Hello Mono World");
-        window.Show ();
-
-        Application.Run ();
-    }
-}
-/* 
-using System;
+﻿using System;
 using System.IO.Ports;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Collections.Generic; 
+using static tests.Testmodel_sut;
+
 using System.Net.NetworkInformation;
+using System.Text;
 
-using static tests.Testmodel_tester;
-using static storage.Resultstorage;
+/* var properties = IPGlobalProperties.GetIPGlobalProperties();
+var stats = NetworkInterfaceComponent.IPv4 switch{
+    NetworkInterfaceComponent.IPv4 => properties.GetTcpIPv4Statistics(),
+        _ => properties.GetTcpIPv6Statistics()
+};
 
-tests.Testmodel_tester test = new tests.Testmodel_tester();
-//test.createSerialPort("/dev/ttyUSB0", 9600);
-//bool serial_result = test.serialTest();
-//Console.WriteLine(serial_result.ToString());
+Console.WriteLine($"TCP/{NetworkInterfaceComponent.IPv4} Statistics");
+Console.WriteLine($"  Minimum Transmission Timeout : {stats.MinimumTransmissionTimeout:#,#}");
+Console.WriteLine($"  Maximum Transmission Timeout : {stats.MaximumTransmissionTimeout:#,#}");
+Console.WriteLine("  Connection Data");
+Console.WriteLine($"      Current :                  {stats.CurrentConnections:#,#}");
+Console.WriteLine($"      Cumulative :               {stats.CumulativeConnections:#,#}");
+Console.WriteLine($"      Initiated  :               {stats.ConnectionsInitiated:#,#}");
+Console.WriteLine($"      Accepted :                 {stats.ConnectionsAccepted:#,#}");
+Console.WriteLine($"      Failed Attempts :          {stats.FailedConnectionAttempts:#,#}");
+Console.WriteLine($"      Reset :                    {stats.ResetConnections:#,#}");
+Console.WriteLine("  Segment Data");
+Console.WriteLine($"      Received :                 {stats.SegmentsReceived:#,#}");
+Console.WriteLine($"      Sent :                     {stats.SegmentsSent:#,#}");
+Console.WriteLine($"      Retransmitted :            {stats.SegmentsResent:#,#}");
+Console.WriteLine();
 
-//int[] own_pins = new int[]{17, 27, 22};
-//int[] sut_pins = new int[]{5, 6, 13};
-//test.createGpioController();
-//bool[] gpio_result_list = test.digitalGpioTest(sut_pins, own_pins);
-//Console.WriteLine(gpio_result_list[0].ToString());
-List<bool> ethernet_test = await test.test_ethernet_port();
-Console.WriteLine(ethernet_test[0]);
-Console.WriteLine(ethernet_test[1]);
+Ping pingSender = new Ping ();
+PingOptions options = new PingOptions ();
+options.DontFragment = true;
 
-
-string real_url = $"https://hutcm.wkong.nl/report";
-string test_url = $"https://httpbin.org/post";
-
-storage.Resultstorage report = new storage.Resultstorage(test_url, 121);
-//if (serial_result){
-//    report.add_testdata("Serial port test", "Test of the serial port succeeded", true);
-//}else{
-//    report.add_testdata("Serial port test", "Test of the serial port failed", false);
-//}
-
-//if (gpio_result_list[0]){
-//    report.add_testdata("GPIO pin test", "Test of the GPIO pin succeeded", true);
-//}else{
-//    report.add_testdata("GPIO pin test", "Test of the GPIO pin failed", false);
-//}
-if (ethernet_test[0]){
-    report.add_testdata("Ethernet port test ip", "SUT has an IP address", true);
-}else{
-    report.add_testdata("Ethernet port test ip", "SUT doesn't have an IP address", false);
-}
-
-if (ethernet_test[1]){
-    report.add_testdata("Ethernet port test ping", "SUT can ping target ip", true);
-}else{
-    report.add_testdata("Ethernet port test ping", "SUT can't ping target ip, timeout exception", false);
-}
-
-bool result = await report.send_testreport();
-Console.WriteLine(result.ToString());
- */
+// Create a buffer of 32 bytes of data to be transmitted.
+string target = "8.8.8.8";
+string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+byte[] buffer = Encoding.ASCII.GetBytes (data);
+int timeout = 120;
+PingReply reply = pingSender.Send (target, timeout, buffer, options);
+if (reply.Status == IPStatus.Success){
+    Console.WriteLine ("Address: {0}", reply.Address.ToString ());
+    Console.WriteLine ("RoundTrip time: {0}", reply.RoundtripTime);
+    Console.WriteLine ("Time to live: {0}", reply.Options.Ttl);
+    Console.WriteLine ("Don't fragment: {0}", reply.Options.DontFragment);
+    Console.WriteLine ("Buffer size: {0}", reply.Buffer.Length);
+} */
+tests.Testmodel_sut test = new tests.Testmodel_sut();
+test.createSerialPort("COM4", 9600);
+test.serialTest();
