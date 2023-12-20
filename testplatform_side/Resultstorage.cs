@@ -40,8 +40,8 @@ namespace storage{
         /// <param name="description">String that contains the error code or a different message</param>
         /// <param name="succesfull">Boolean to indicate wether the test passed or failed</param>
         /// <returns>true if succeeded</returns>
-        public bool add_testdata(string name, string description, bool succesfull){
-            Tests_data tests_data= new Tests_data (name, description, succesfull);
+        public bool add_testdata(string name, string description, bool succesfull, long time_elapsed){
+            Tests_data tests_data= new Tests_data (name, description, succesfull, time_elapsed);
             tests.Add(tests_data);
             return true;
         }
@@ -114,29 +114,49 @@ namespace storage{
     }
 
     /// <summary>
-    /// Class that holds the testdata, it contains a name, a description and a boolean representing pass of fail
+    /// Class that holds the testdata, it contains a name, a description, a boolean representing pass of fail and a long integer for the test's elapsed time
     /// </summary>
     class Tests_data{
         public string Name{get;set;}
         public string Description{get;set;}
-        public bool Successfull{get;set;}
+        public bool Successful{get;set;}
+        public long TestDurationInMilliseconds{get;set;}
 
-        public Tests_data(string name, string description, bool successfull){
-            this.Name = name;
-            this.Description = description;
-            this.Successfull = successfull;
+        /// <summary>
+        /// Constructor to add test data to the report to be sent to the API
+        /// </summary>
+        /// <param name="name">String with the test name</param>
+        /// <param name="description">String with a description or the error message</param>
+        /// <param name="successful">Boolean that indicates wether the test has passed or gailed</param>
+        /// <param name="time_elapsed">Long int that holds the time it took to execute the test</param>
+        public Tests_data(string name, string description, bool successful, long time_elapsed){
+            Name = name;
+            Description = description;
+            Successful = successful;
+            TestDurationInMilliseconds = time_elapsed;
         }
     }
 
+    /// <summary>
+    /// Class that holds the login credentials for the API
+    /// </summary>
     class login_data{
         public string Username{get;set;}
         public string Password{get;set;}
+        /// <summary>
+        /// Constructor function for the login credentials
+        /// </summary>
+        /// <param name="username">String with username</param>
+        /// <param name="password">String with password</param>
         public login_data(string username, string password){
             this.Username = username;
             this.Password = password;
         }
     }
 
+    /// <summary>
+    /// Class that holds the API's response data
+    /// </summary>
     class response_data{
         public string id{get;set;}
         public string username{get;set;}
