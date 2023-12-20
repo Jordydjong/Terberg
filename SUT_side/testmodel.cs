@@ -1,3 +1,10 @@
+using System.Device.Gpio;
+using System;
+using System.IO.Ports;
+using System.Threading;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.IO.Ports;
 using System.Device.Gpio;
@@ -36,6 +43,13 @@ namespace tests{
             serialPort.Open();
             return serialPort;
         }
+        /// <summary>
+        ///Function to create GpioController object used for communicating with GPIO. 
+        /// </summary>
+        public void createGpioController(){
+            controller = new GpioController();
+        }
+
 
         /// <summary>
         /// Function to test the serial connection.
@@ -115,6 +129,59 @@ namespace tests{
 
             return results;
         }
-
+        /// <summary>
+        /// receives a digital pulsewave from the testsystem. also sends if the test was succesful via serial port to the testsystem.
+        /// </summary>
+        /// <param name="readpin">list of pins needed to be tested.</param>
+        public async void PulseWaveTest(int readpin){
+                Stopwatch stopwatch = new Stopwatch();
+                PinValue[] result = new PinValue[]{};
+                controller.OpenPin(readpin, PinMode.Input);
+                bool receiving = true;
+                PinValue last_value = controller.Read(readpin);
+                while (receiving == true){
+                    PinValue read_val = controller.Read(readpin);
+                    if (read_val != last_value){
+                        stopwatch.Stop();
+                        stopwatch.Reset();
+                        result = result.Append<PinValue>(read_val).ToArray();
+                        last_value = read_val;
+                        stopwatch.Start();
+                    }
+                    if (stopwatch.Elapsed.TotalSeconds > 3){
+                            Console.WriteLine("3 seconden verstreken");
+                            int counthigh = 0;
+                            int countlow = 0;
+                            foreach (PinValue j in result){
+                                if (j == PinValue.High){
+                                    // Console.WriteLine("HIGH");
+                                    counthigh++;
+                                }
+                                else if (j == PinValue.Low){
+                                    // Console.WriteLine("LOW");
+                                    countlow++;
+                                }
+                            }
+                            if (counthigh == 1000 && countlow == 1000){
+                                Console.WriteLine("true gestuurd");
+                                serialPort.WriteLine("true");
+                                serialPort.Write("Done sending.\n");
+                                // Console.WriteLine("done 1 gestuurd");
+                                receiving = false;
+                            }
+                            else{
+                                Console.WriteLine("false gestuurd");
+                                serialPort.WriteLine("false");
+                                serialPort.Write("Done sending.\n");
+                                // Console.WriteLine("done 0 gestuurd");
+                                Console.WriteLine(result.Length);
+                                receiving = false;
+                            } 
+                        }
+                }
+            serialPort.DiscardOutBuffer();
+            stopwatch.Reset();
+        }
     }
 };
+
