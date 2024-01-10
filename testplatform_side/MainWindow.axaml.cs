@@ -28,7 +28,9 @@ public partial class MainWindow : Window{
     }
 
     
-
+    /// <summary>
+    /// Function 
+    /// </summary>
     async public void ClickHandler(object sender, RoutedEventArgs args){
         Window hostWindow = (Window)VisualRoot;
         if (!done){
@@ -44,6 +46,7 @@ public partial class MainWindow : Window{
             await Task.Delay(1000);
             
             TextBlock_serial.Text = "Seriele test bezig";
+            await Task.Delay(500);
             bool serial_result = test.serialTest();
             if (serial_result){
                 testresults.Add(true);
@@ -57,6 +60,7 @@ public partial class MainWindow : Window{
             await Task.Delay(1000);
             
             TextBlock_ethernet.Text = "Ethernet test bezig";
+            await Task.Delay(500);
             List<bool> ethernet_test = test.test_ethernet_port();
             if (ethernet_test[0] == ethernet_test[1] == true){
                 testresults.Add(true);
@@ -72,7 +76,7 @@ public partial class MainWindow : Window{
             test.createGpioController();
             int[] own_pins = new int[]{23, 25};
             TextBlock_digitalGPIO.Text = "Digitale GPIO test bezig";
-            await Task.Delay(1000);
+            await Task.Delay(500);
             bool[] result = await test.digitalGpioTest(own_pins);
             if (result.Contains(false)){
                 testresults.Add(false);
@@ -94,6 +98,7 @@ public partial class MainWindow : Window{
             Console.WriteLine(result_ip_test); */
 
             TextBlock1.Text = "Test programma is klaar";
+            await Task.Delay(500);
             Console.WriteLine(testresults);
             for (int i = 0; i < testresults.Count; i++){
                 Console.WriteLine(testresults[i]);
