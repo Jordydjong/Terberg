@@ -49,12 +49,6 @@
             FontSize="30"
             HorizontalAlignment="Center"
             VerticalAlignment="Center" />
-        <TextBlock
-            Name="TextBlock_analogGPIO"
-            Text=""
-            FontSize="30"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center" />
     </StackPanel>
 
 </Window>
