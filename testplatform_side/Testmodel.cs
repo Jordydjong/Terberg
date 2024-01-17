@@ -1,21 +1,15 @@
 using System;
 using System.IO.Ports;
 using System.Device.Gpio;
-using System.Threading;
 using System.Linq;
-using System.Net; 
-using System.Net.NetworkInformation;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Drawing;
+using System.Net;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Diagnostics;
-using static storage.Resultstorage;
-//deze is voor test module
-namespace tests{
+
+namespace tests
+{
     /// <summary>
     /// A Testmodel.
     /// </summary>
@@ -27,25 +21,34 @@ namespace tests{
         long elapsed_time;
         storage.Resultstorage report;
         string exception;
-            
+        
+        /// <summary>
+        /// Constructor function for the testmodel
+        /// </summary>
+        /// <param name="report_input">Reference to the result storage to store the test's results</param>
+        /// <param name="timeout">Integer to set the HttpClient's timeout</param>
         public Testmodel_tester(storage.Resultstorage report_input, int timeout = 5){
             report = report_input;
-            client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(timeout);
+            client = new HttpClient{
+                Timeout = TimeSpan.FromSeconds(timeout)
+            };
             stopWatch = new Stopwatch();
         }
-
+        
         /// <summary>
         /// Function for the serial port's creation and setup
         /// </summary>
         /// <param name="port">String that refers to the serial port you want to use</param>
         /// <param name="baudrate">Int for the baudrate</param>
+        /// <returns>Returns a SerialPort reference to be used in the main program</returns>
         public SerialPort createSerialPort(string port, int baudrate){
-            serialPort = new SerialPort(port, baudrate);
-            serialPort.ReadTimeout = 3000;
-            serialPort.WriteTimeout = 2000;
-            serialPort.RtsEnable = true;
-            serialPort.DtrEnable = true;
+            serialPort = new SerialPort(port, baudrate)
+            {
+                ReadTimeout = 3000,
+                WriteTimeout = 2000,
+                RtsEnable = true,
+                DtrEnable = true
+            };
             serialPort.Open();
             return serialPort;
         }
@@ -65,15 +68,12 @@ namespace tests{
                 string message;
                 try{
                     message = serialPort.ReadLine();
-                    Console.WriteLine(message);
                     if (message == "General Kenobi"){
                         serialPort.Write("Greeting complete?\n");
                         message = serialPort.ReadLine();
-                        Console.WriteLine(message);
                         if (message == "Greeting complete!"){
                             stopWatch.Stop();
                             elapsed_time = stopWatch.ElapsedMilliseconds;
-                            Console.WriteLine(elapsed_time.ToString());
                             stopWatch.Reset();
                             report.add_testdata("Serial port test", "Test of the serial port succeeded", true, elapsed_time);
                             return true;
@@ -85,12 +85,16 @@ namespace tests{
             }
             stopWatch.Stop();
             elapsed_time = stopWatch.ElapsedMilliseconds;
-            Console.WriteLine(elapsed_time.ToString());
             stopWatch.Reset();
             report.add_testdata("Serial port test", exception, false, elapsed_time);
             return false;
         }
 
+        /// <summary>
+        /// Function that loops untill a message is received
+        /// </summary>
+        /// <param name="serialPort">Reference to the SerialPort</param>
+        /// <returns>String with the message that has been received</returns>
         private string wait_for_message(SerialPort serialPort){
             while (true){
                 try{
@@ -101,23 +105,19 @@ namespace tests{
         }   
 
         /// <summary>
-        /// Function that tests the ethernet port. It uses the private functions ip_test() and www_test()
-        /// 
+        /// Function that tests the ethernet port. It sends the start signal to the SUT and then waits for a response.
         /// </summary>
-        /// <param name="ping_target">String of the URL of the webpage you want the device to be able to reach</param>
-        /// <returns>Returns a list of booleans for each test one. The type is Task<List<bool>> because the function is asynchronous"<</returns>
-        public List<bool> test_ethernet_port(string ping_target= "https://google.com"){
+        /// <returns>Returns a list of booleans with the testresults<</returns>
+        public List<bool> test_ethernet_port(){
             serialPort.WriteLine("Start ethernet test");
             stopWatch.Start();
             string message = wait_for_message(serialPort);
             while (!message.Contains("ethernet")){
                 message = wait_for_message(serialPort);
-                Console.WriteLine(message);
             };
 
             stopWatch.Stop();
             elapsed_time = stopWatch.ElapsedMilliseconds;
-            Console.WriteLine(elapsed_time.ToString());
             stopWatch.Reset();
 
             List<string> message_cut = message.Split(';').ToList();
@@ -163,10 +163,8 @@ namespace tests{
 
             for (int i = 0; i < amount_of_pulses; i++){
                 controller.Write(writepin, PinValue.High);
-                //Thread.Sleep(width);
                 await Task.Delay(width);
                 controller.Write(writepin, PinValue.Low);
-                //Thread.Sleep(period - width);
                 await Task.Delay(period - width);
             }
             return validation.ToString();
@@ -193,21 +191,13 @@ namespace tests{
                     serialPort.Write("Done sending.\n");
                     try{
                         string message = serialPort.ReadLine();
-                        Console.Write("Message: ");
-                        Console.WriteLine(message);
-                        
                         if (message != "Done sending."){
                             validation = message;
                         }
 
                         else{
-                            Console.WriteLine("done");
-                            Console.WriteLine(message);
-                            Console.WriteLine(validation);
-
                             stopWatch.Stop();
                             elapsed_time = stopWatch.ElapsedMilliseconds;
-                            Console.WriteLine(elapsed_time.ToString());
                             stopWatch.Reset();
 
                             if (validation == "true"){
@@ -221,11 +211,10 @@ namespace tests{
                             await Task.Delay(500);
                         }
                     }
-                    catch(TimeoutException e){
+                    catch(TimeoutException){
                         if (number_of_fails > 3){
                             stopWatch.Stop();
                             elapsed_time = stopWatch.ElapsedMilliseconds;
-                            Console.WriteLine(elapsed_time.ToString());
                             stopWatch.Reset();
 
                             report.add_testdata("Digital GPIO pin "+Ownpins[i].ToString(), "Pin does not work correct", false, elapsed_time);
@@ -234,57 +223,12 @@ namespace tests{
                             Result_per_pin = Result_per_pin.Append<bool>(false).ToArray();
                         }else{
                             number_of_fails += 1;
-                            Console.WriteLine("\nException Caught!");
-                            Console.WriteLine("Message :{0} ", e.Message);
                         }
                     }
                 }
             }
             return Result_per_pin;
         }
-        
-        /// <summary>
-        /// Private function to check if the device has an IP address
-        /// </summary>
-        /// <returns>Boolean true if the device has an IP address, else it returns false</returns>
-        private bool ip_test(){
-            try{
-                IPAddress[] ipaddress = Dns.GetHostAddresses(Dns.GetHostName() + ".medewerkers.ad.hvu.nl");  
-                /* Console.WriteLine("IP Address of Machine is");  
-                foreach(IPAddress ip in ipaddress)  
-                {  
-                    Console.WriteLine(ip.ToString());  
-                }  */ 
-            }catch (Exception e){
-                Console.WriteLine(e);
-                return false;
-            }
-            return true;
-        }
-        /// <summary>
-        /// Function to test the connection to the World Wide Web. It sends a request to an URL and
-        /// if it gets something back then it returns true, else it returns false
-        /// </summary>
-        /// <param name="target_url">String that contains the URL of the webpage you want to check</param>
-        /// <returns>Boolean true if the test succeeded. False if it failed</returns>
-        private async Task<bool> www_test(string target_url){
-            try{
-                string responseBody = await client.GetStringAsync(target_url);
-
-                //Console.WriteLine(responseBody);
-                if (responseBody != ""){
-                    return true;
-                }else{
-                    return false;
-                }
-            }catch (HttpRequestException e){
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-                
-                return false;
-            }
-        }
-
     }
 };
 
