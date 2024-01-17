@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace tests
 {
     /// <summary>
-    /// A Testmodel.
+    /// Class that holds the tests on the testplatform side
     /// </summary>
     class Testmodel_tester{
         SerialPort serialPort;
