@@ -8,7 +8,7 @@
         x:DataType="vm:MainWindowViewModel"
         WindowState="FullScreen"
         Background="White"
-        Title="avaloniaExtTest">
+        Title="Testplatform Raspberry Pi">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
