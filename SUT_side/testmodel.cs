@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Drawing;
 using System.Net.Http;
+using System.Net.Cache;
 
 //deze is voor SUT
 namespace tests{
@@ -81,8 +82,10 @@ namespace tests{
         /// </summary>
         /// <returns>Boolean true if the device has an IP address, else it returns false</returns>
         private bool ip_test(){
-            string hostName = Dns.GetHostName();
-            string myIP = Dns.GetHostEntry(hostName).AddressList[0].ToString();
+            string domain = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
+            string hostName = Dns.GetHostName()+ "." + domain;
+            Console.WriteLine(domain);
+            string myIP = Dns.GetHostEntry(hostName).AddressList[0].ToString(); 
             if (myIP != ""){
                 return true;
             }else{
@@ -100,7 +103,6 @@ namespace tests{
                 // Above three lines can be replaced with new helper method below
                 string responseBody = await client.GetStringAsync(target_url);
 
-                //Console.WriteLine(responseBody);
                 if (responseBody != ""){
                     return true;
                 }else{

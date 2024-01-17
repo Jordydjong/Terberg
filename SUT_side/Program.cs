@@ -27,7 +27,7 @@ if (message == "Start ethernet test"){
     List<bool> ethernet_test = await test.test_ethernet_port();
     serialPort.WriteLine("Result ethernet test;"+ethernet_test[0].ToString()+";"+ethernet_test[1].ToString());
 }
-int[] SUTpins = new int[]{18, 24};  
+int[] SUTpins = new int[]{23, 25};  
 
 test.createGpioController();
 
