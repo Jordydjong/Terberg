@@ -20,6 +20,9 @@ using System.Net.Cache;
 
 //deze is voor SUT
 namespace tests{
+    /// <summary>
+    /// Class written for the Subject under test side of our test system
+    /// </summary>
     class Testmodel_sut{
         SerialPort serialPort;
         GpioController controller;
