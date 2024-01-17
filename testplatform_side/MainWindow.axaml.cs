@@ -1,21 +1,11 @@
 using System;
-using System.Drawing;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Avalonia.Media;
 using Avalonia.Interactivity;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO.Ports;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Net.NetworkInformation;
-using static tests.Testmodel_tester;
 
 using System.Linq;
-using System.Diagnostics;
 
 namespace avaloniaExtTest.Views;
 
@@ -43,7 +33,7 @@ public partial class MainWindow : Window{
             storage.Resultstorage report = new storage.Resultstorage(url, 121);
             tests.Testmodel_tester test = new tests.Testmodel_tester(report);
             SerialPort serialPort = test.createSerialPort("/dev/ttyUSB0", 9600);
-            await Task.Delay(1000);
+            await Task.Delay(500);
             
             TextBlock_serial.Text = "Seriele test bezig";
             await Task.Delay(500);
@@ -88,14 +78,6 @@ public partial class MainWindow : Window{
                 TextBlock_digitalGPIO.Foreground = Avalonia.Media.Brushes.DarkGreen;
             }
             await Task.Delay(1000);
-            
-            
-            /* bool result_www_test = await test.www_test("http://www.google.nl");
-            Console.Write("WWW test: ");
-            Console.WriteLine(result_www_test);
-            bool result_ip_test = test.ip_test();
-            Console.Write("IP test: ");
-            Console.WriteLine(result_ip_test); */
 
             TextBlock1.Text = "Test programma is klaar";
             await Task.Delay(500);
