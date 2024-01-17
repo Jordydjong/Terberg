@@ -1,15 +1,14 @@
 using System;
-using System.IO.Ports;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 
-namespace storage{
+namespace storage
+{
     /// <summary>
     /// Class for collection, storage and sending of the testdata
     /// </summary>
